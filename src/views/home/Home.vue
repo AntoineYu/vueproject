@@ -5,16 +5,28 @@
 </template>
 <script>
 import NavBar from 'components/common/navbar/NavBar'
+import {getHomeMultiData} from 'network/home'
+
 export default {
     name: 'Home',
     components: {
         NavBar
+    },
+    data(){
+        return {
+            result: null
+        }
+    },
+    created() {
+        getHomeMultiData().then(res => {
+            console.log(res);
+        })
     }
 }
 </script>
 <style scoped>
     .home-nav {
         background-color: var(--color-tint);
-        color: white;
+        color: #fff;
     }
 </style>

@@ -12,14 +12,16 @@ export default {
     components: {
         NavBar
     },
-    data(){
+    data() {
         return {
-            result: null
+            banners: [],
+            recommends: []
         }
     },
     created() {
         getHomeMultiData().then(res => {
-            console.log(res);
+            this.banners = res.data.banner.list
+            this.recommends = res.data.recommend.list
         })
     }
 }

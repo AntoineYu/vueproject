@@ -4,7 +4,9 @@
       <home-swiper :banners="banners"></home-swiper>
       <home-recommend :recommends="recommends"></home-recommend>
       <home-feature></home-feature>
-      <tab-control class="tab-control" :titles="['流行', '新款', '精选']"></tab-control>
+      <tab-control class="tab-control" 
+      :titles="['流行', '新款', '精选']" @tabClick="tabClick"></tab-control>
+      <goods-list :goods="showGoods"></goods-list>
       <ul>
           <li>1</li>
           <li>2</li>
@@ -117,8 +119,12 @@ import HomeFeature from './childComps/HomeFeature'
 //公共组件
 import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
+import GoodsList from 'components/content/goods/GoodsList'
 //一些方法
-import {getHomeMultiData} from 'network/home'
+import {
+    getHomeMultiData, 
+    getHomeGoods
+} from 'network/home'
 
 
 export default {
@@ -128,7 +134,8 @@ export default {
         HomeRecommend,
         HomeFeature,
         NavBar,
-        TabControl
+        TabControl,
+        GoodsList
     },
     data() {
         return {
@@ -138,14 +145,50 @@ export default {
                 'pop': {pape: 0, list: []},
                 'new': {pape: 0, list: []},
                 'sell': {pape: 0, list: []}
-            }
+            },
+            currentType: 'pop'
+        }
+    },
+    computed: {
+        showGoods() {
+            return this.goods[this.currentType].list
         }
     },
     created() {
-        getHomeMultiData().then(res => {
+        this.getHomeMultiData()
+
+        this.getHomeGoods('pop')
+    },
+    methods: {
+        //事件监听方法
+        tabClick(index) {
+            switch(index) {
+                case 0: 
+                    this.currentType = 'pop'
+                    break
+                case 1:
+                    this.currentType = 'new'
+                    break
+                case 2:
+                    this.currentType = 'sell'
+                    break
+            }
+        },
+        //网络请求方法
+        getHomeMultiData() {
+            getHomeMultiData().then(res => {
             this.banners = res.data.banner.list
             this.recommends = res.data.recommend.list
+            })
+        },
+        getHomeGoods(type) {
+            const page = this.goods[type].page + 1
+            getHomeGoods(type, page).then(res => {
+                console.log(res);
+            this.goods[type].list.push(...res.data.list)
+            this.goods[type].page += 1
         })
+        }
     }
 }
 </script>
@@ -166,5 +209,6 @@ export default {
     .tab-control {
         position: sticky;
         top: 44px;
+        z-index: 9;
     }
 </style>

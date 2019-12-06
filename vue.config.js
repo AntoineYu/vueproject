@@ -11,7 +11,7 @@ module.exports = {
         }
       }
     },
-    lintOnSave : false
+    lintOnSave: false
   }
 
 // const path = require('path');//引入path模块

@@ -2,11 +2,13 @@
   <div id="home">
       <nav-bar class="home-nav"><div slot="center">Shopping</div></nav-bar>
       <home-swiper :banners="banners"></home-swiper>
+      <home-recommend :recommends="recommends"></home-recommend>
   </div>
 </template>
 <script>
 import NavBar from 'components/common/navbar/NavBar'
 import HomeSwiper from './childComps/HomeSwiper'
+import HomeRecommend from './childComps/HomeRecommend'
 
 import {getHomeMultiData} from 'network/home'
 
@@ -15,7 +17,8 @@ export default {
     name: 'Home',
     components: {
         NavBar,
-        HomeSwiper
+        HomeSwiper,
+        HomeRecommend
     },
     data() {
         return {

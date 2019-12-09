@@ -1,5 +1,5 @@
 <template>
-  <div calss="wrapper" ref="wrapper">
+  <div ref="wrapper">
       <div class="content">
           <slot>
           </slot>
@@ -10,6 +10,12 @@
 import BScroll from 'better-scroll'
 export default {
     name: 'scroll',
+    props: {
+        probeType: {
+            type: Number,
+            default: 0
+        }
+    },
     data() {
         return {
             scroll: null
@@ -17,8 +23,17 @@ export default {
     },
     mounted() {
         this.scroll = new BScroll(this.$refs.wrapper, {
-            click: true
+            click: true,
+            probeType: 3
         })
+        this.scroll.on('scroll', position => {
+            this.$emit('scroll', position)
+        })
+    },
+    methods: {
+        scrollTo(x, y, time=300) {
+            this.scroll.scrollTo(x, y, time)
+        }
     }
 }
 </script>

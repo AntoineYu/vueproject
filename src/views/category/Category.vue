@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" ref="wrapper">
       <ul>
           <li>1</li>
           <li>2</li>
@@ -114,7 +114,7 @@ export default {
         }
     },
     mounted() {
-        this.scroll = new BScroll(document.querySelector('.content'), {
+        this.scroll = new BScroll(this.$refs.wrapper, {
             //2表示手指离开时的位置，3表示所有位置，包括惯性位置
             probeType: 3,
             pullUpload: true

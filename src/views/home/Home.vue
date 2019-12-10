@@ -166,7 +166,8 @@ export default {
             currentType: 'pop',
             isShowBackTop: true,
             tabOffSetTop: 0,
-            isTabFixed: false
+            isTabFixed: false,
+            saveY: 0
         }
     },
     computed: {
@@ -180,6 +181,13 @@ export default {
         this.getHomeGoods('pop')
         // this.getHomeGoods('new')
         // this.getHomeGoods('sell')
+    },
+    actived() {
+        this.$refs.scroll.scrollTo(0, this.saveY, 0)
+        this.$refs.scroll.refresh()
+    },
+    deactived() {
+        this.saveY = this.$refs.scroll.getScrollY()
     },
     mouted() {
         const refresh = debounce(this.$refs.scroll.refresh, 200)

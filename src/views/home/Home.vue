@@ -174,12 +174,24 @@ export default {
         // this.getHomeGoods('sell')
     },
     mouted() {
+        const refresh = this.debounce(this.$refs.scroll.refresh, 200)
         this.$bus.$on('itemImgLoad', () => {
-            this.$refs.scroll.refresh()
+            refresh()
         })
     },
     methods: {
         //事件监听方法
+        //防抖函数 防止请求过于频繁
+        debounce(func, delay) {
+            let timer = null
+            return function(...args) {
+                if(timer) clearTimeout(timer)
+
+                timer = setTimeout(() => {
+                    func.apply(this, args)
+                }, delay)
+            }
+        },
         tabClick(index) {
             switch(index) {
                 case 0:

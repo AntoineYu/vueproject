@@ -2,16 +2,18 @@
   <div id="home">
       <nav-bar class="home-nav"><div slot="center">Shopping</div></nav-bar>
 
-      <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+      <scroll class="content" ref="scroll"
+      :probe-type="3" @scroll="contentScroll"
+      :pulling-up="true" @pullingUp="loadMore">
         <home-swiper :banners="banners"></home-swiper>
         <home-recommend :recommends="recommends"></home-recommend>
         <home-feature></home-feature>
-        <tab-control class="tab-control" 
+        <tab-control class="tab-control"
         :titles="['流行', '新款', '精选']" @tabClick="tabClick"></tab-control>
         <goods-list :goods="showGoods"></goods-list>
       </scroll>
       <!-- 想要监听组件的点击，必须加上native -->
-      <back-top @Click.native="backTopClick" v-show="isShowBackTop"></back-top>
+      <back-top @click.native="backTopClick" v-show="isShowBackTop"></back-top>
       <ul>
           <li>1</li>
           <li>2</li>
@@ -129,7 +131,7 @@ import Scroll from 'components/common/scroll/Scroll'
 import BackTop from 'components/content/backTop/BackTop'
 //一些方法
 import {
-    getHomeMultiData, 
+    getHomeMultiData,
     getHomeGoods
 } from 'network/home'
 
@@ -168,12 +170,19 @@ export default {
         this.getHomeMultiData()
 
         this.getHomeGoods('pop')
+        // this.getHomeGoods('new')
+        // this.getHomeGoods('sell')
+    },
+    mouted() {
+        this.$bus.$on('itemImgLoad', () => {
+            this.$refs.scroll.refresh()
+        })
     },
     methods: {
         //事件监听方法
         tabClick(index) {
             switch(index) {
-                case 0: 
+                case 0:
                     this.currentType = 'pop'
                     break
                 case 1:
@@ -191,6 +200,10 @@ export default {
         contentScroll(position) {
             this.isShowBackTop = -position.y > 1000
         },
+        loadMore() {
+            this.getHomeGoods(this.currentType)
+        },
+
         //网络请求方法
         getHomeMultiData() {
             getHomeMultiData().then(res => {
@@ -204,6 +217,8 @@ export default {
                 console.log(res);
             this.goods[type].list.push(...res.data.list)
             this.goods[type].page += 1
+
+            this.$refs.scroll.finishPullUp()
         })
         }
     }

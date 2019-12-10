@@ -34,9 +34,11 @@ export default {
         this.scroll.on('scroll', position => {
             this.$emit('scroll', position)
         })
-        this.scroll.on('pullingUp', () => {
+        if(this.pullUpLoad === 2 || this.pullUpLoad ===3){
+            this.scroll.on('pullingUp', () => {
             this.$emit('pullingUp')
         })
+        }
     },
     methods: {
         scrollTo(x, y, time=300) {

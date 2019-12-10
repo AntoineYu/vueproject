@@ -1,15 +1,19 @@
 <template>
   <div id="home">
       <nav-bar class="home-nav"><div slot="center">Shopping</div></nav-bar>
-
+        <tab-control class="tab-control"
+            :titles="['流行', '新款', '精选']" 
+            @tabClick="tabClick" ref="tabControl1"
+            v-show="isTabFixed">
+        </tab-control>
       <scroll class="content" ref="scroll"
       :probe-type="3" @scroll="contentScroll"
       :pulling-up="true" @pullingUp="loadMore">
-        <home-swiper :banners="banners"></home-swiper>
+        <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
         <home-recommend :recommends="recommends"></home-recommend>
         <home-feature></home-feature>
-        <tab-control class="tab-control"
-        :titles="['流行', '新款', '精选']" @tabClick="tabClick"></tab-control>
+        <tab-control :titles="['流行', '新款', '精选']" 
+        @tabClick="tabClick" ref="tabControl2"></tab-control>
         <goods-list :goods="showGoods"></goods-list>
       </scroll>
       <!-- 想要监听组件的点击，必须加上native -->
@@ -135,6 +139,8 @@ import {
     getHomeGoods
 } from 'network/home'
 
+import {debounce} from 'common/utils'
+
 
 export default {
     name: 'Home',
@@ -158,7 +164,9 @@ export default {
                 'sell': {pape: 0, list: []}
             },
             currentType: 'pop',
-            isShowBackTop: true
+            isShowBackTop: true,
+            tabOffSetTop: 0,
+            isTabFixed: false
         }
     },
     computed: {
@@ -174,24 +182,13 @@ export default {
         // this.getHomeGoods('sell')
     },
     mouted() {
-        const refresh = this.debounce(this.$refs.scroll.refresh, 200)
+        const refresh = debounce(this.$refs.scroll.refresh, 200)
         this.$bus.$on('itemImgLoad', () => {
             refresh()
         })
     },
     methods: {
         //事件监听方法
-        //防抖函数 防止请求过于频繁
-        debounce(func, delay) {
-            let timer = null
-            return function(...args) {
-                if(timer) clearTimeout(timer)
-
-                timer = setTimeout(() => {
-                    func.apply(this, args)
-                }, delay)
-            }
-        },
         tabClick(index) {
             switch(index) {
                 case 0:
@@ -204,16 +201,24 @@ export default {
                     this.currentType = 'sell'
                     break
             }
+            this.$refs.tabControl1.currentIndex = index
+            this.$refs.tabControl2.currentIndex = index
         },
         backTopClick() {
-            console.log(this.$refs.scroll);
+            // console.log(this.$refs.scroll);
             this.$refs.scroll.scrollTo(0, 0, 500)
         },
         contentScroll(position) {
+            //判断backTop是否显示
             this.isShowBackTop = -position.y > 1000
+            //决定tabControl是否吸顶
+
         },
         loadMore() {
             this.getHomeGoods(this.currentType)
+        },
+        swiperImageLoad() {
+            this.tabOffSetTop = this.$refs.tabControl2.$el.offsetTop
         },
 
         //网络请求方法
@@ -238,22 +243,23 @@ export default {
 </script>
 <style scoped>
     #home {
-        padding-top: 44px;
+        /* padding-top: 44px; */
         position: relative;
     }
     .home-nav {
         background-color: var(--color-tint);
         color: #fff;
 
-        position: fixed;
+        /* 在使用浏览器原生滚动时，为了让导航不跟着一起滚动 */
+        /* position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        z-index: 0;
+        z-index: 0; */
     }
     .tab-control {
         /* position: sticky; */
-        top: 44px;
+        position: relative;
         z-index: 9;
     }
 
